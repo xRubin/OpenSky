@@ -16,6 +16,7 @@ class StateFabric implements StateFabricInterface
         $data[16] = array_key_exists(16, $data) ? PositionSource::tryFrom($data[16]) : null;
         if ($data[16] === null)
             $data[16] = PositionSource::from(0);
+
         $data[17] = array_key_exists(17, $data) ? AircraftCategory::tryFrom($data[17]) : null;
 
         return new State(...$data);
