@@ -52,3 +52,4 @@ jobs:
         run: |
           composer global require php-coveralls/php-coveralls
           php-coveralls --coverage_clover=build/logs/clover.xml -v
+        if: ${{ matrix.php-version == env.COVERAGE_PHP_VERSION }}
