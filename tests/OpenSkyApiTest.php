@@ -3,11 +3,11 @@
 namespace tests;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use OpenSky\FlightInterface;
-use OpenSky\FlightsResponse;
 use OpenSky\FlightsResponseFabricInterface;
 use OpenSky\FlightsResponseInterface;
 use OpenSky\OpenSkyApi;
@@ -16,6 +16,7 @@ use OpenSky\StateInterface;
 use OpenSky\StatesResponse;
 use OpenSky\StatesResponseFabricInterface;
 use OpenSky\StatesResponseInterface;
+use OpenSky\TooManyRequestsException;
 use OpenSky\UnauthorizedException;
 use PHPUnit\Framework\TestCase;
 
@@ -90,6 +91,7 @@ final class OpenSkyApiTest extends TestCase
 
         $response = $openSkyApi->getStatesOwn();
         $this->assertInstanceOf(StatesResponseInterface::class, $response);
+        $this->assertEquals(1717424054, $response->getTime());
         $states = $response->getStates();
         $this->assertIsArray($states);
 
@@ -140,6 +142,57 @@ final class OpenSkyApiTest extends TestCase
         $this->assertEquals(0, $flight->getArrivalAirportCandidatesCount());
     }
 
+    public function testCanParseFlightsAircraftResponse()
+    {
+        $mock = new MockHandler([
+            new Response(200, [], json_encode([
+                ['icao24' => '84630c', 'firstSeen' => 1517229441, 'estDepartureAirport' => null, 'lastSeen' => 1517230681, 'estArrivalAirport' => null, 'callsign' => 'JJP120  ', 'estDepartureAirportHorizDistance' => null, 'estDepartureAirportVertDistance' => null, 'estArrivalAirportHorizDistance' => null, 'estArrivalAirportVertDistance' => null, 'departureAirportCandidatesCount' => 0, 'arrivalAirportCandidatesCount' => 0],
+            ])),
+        ]);
+
+        $openSkyApi = new OpenSkyApi();
+        $openSkyApi->setClient(new Client(['handler' => HandlerStack::create($mock)]));
+
+        $response = $openSkyApi->getFlightsAircraft(icao24: '84630c', begin: 1517227200, end: 1517230800);
+        $this->assertInstanceOf(FlightsResponseInterface::class, $response);
+        $flights = $response->getFlights();
+        $this->assertIsArray($flights);
+    }
+
+    public function testCanParseFlightsArrivalResponse()
+    {
+        $mock = new MockHandler([
+            new Response(200, [], json_encode([
+                ['icao24' => '800547', 'firstSeen' => 1517227477, 'estDepartureAirport' => 'VGTJ', 'lastSeen' => 1517228618, 'estArrivalAirport' => 'EDDB', 'callsign' => 'JAI273  ', 'estDepartureAirportHorizDistance' => 6958, 'estDepartureAirportVertDistance' => 655, 'estArrivalAirportHorizDistance' => null, 'estArrivalAirportVertDistance' => null, 'departureAirportCandidatesCount' => 1, 'arrivalAirportCandidatesCount' => 1],
+            ])),
+        ]);
+
+        $openSkyApi = new OpenSkyApi();
+        $openSkyApi->setClient(new Client(['handler' => HandlerStack::create($mock)]));
+
+        $response = $openSkyApi->getFlightsArrival(airport: 'EDDB', begin: 1517227200, end: 1517230800);
+        $this->assertInstanceOf(FlightsResponseInterface::class, $response);
+        $flights = $response->getFlights();
+        $this->assertIsArray($flights);
+    }
+
+    public function testCanParseFlightsDepartureResponse()
+    {
+        $mock = new MockHandler([
+            new Response(200, [], json_encode([
+                ['icao24' => '800547', 'firstSeen' => 1517227477, 'estDepartureAirport' => 'VGTJ', 'lastSeen' => 1517228618, 'estArrivalAirport' => 'EDDB', 'callsign' => 'JAI273  ', 'estDepartureAirportHorizDistance' => 6958, 'estDepartureAirportVertDistance' => 655, 'estArrivalAirportHorizDistance' => null, 'estArrivalAirportVertDistance' => null, 'departureAirportCandidatesCount' => 1, 'arrivalAirportCandidatesCount' => 1],
+            ])),
+        ]);
+
+        $openSkyApi = new OpenSkyApi();
+        $openSkyApi->setClient(new Client(['handler' => HandlerStack::create($mock)]));
+
+        $response = $openSkyApi->getFlightsDeparture(airport: 'VGTJ', begin: 1517227200, end: 1517230800);
+        $this->assertInstanceOf(FlightsResponseInterface::class, $response);
+        $flights = $response->getFlights();
+        $this->assertIsArray($flights);
+    }
+
     public function testUnauthorizedAccessShouldThrowException()
     {
         $mock = new MockHandler([
@@ -160,16 +213,41 @@ final class OpenSkyApiTest extends TestCase
         $openSkyApi->getStatesAll();
     }
 
+    public function testTooManyRequestsAccessShouldThrowException()
+    {
+        $mock = new MockHandler([
+            new Response(429, [], json_encode([
+                'timestamp' => time(),
+                'status' => 429,
+                'error' => 'Too Many Requests',
+                'message' => 'Too Many Requests',
+                'path' => '/states/all'
+            ])),
+        ]);
+
+        $openSkyApi = new OpenSkyApi();
+        $openSkyApi->setClient(new Client(['handler' => HandlerStack::create($mock)]));
+        $openSkyApi->setCredentials('{username}', '{password}');
+
+        $this->expectException(TooManyRequestsException::class);
+        $openSkyApi->getStatesAll();
+    }
+
+    public function testCanOverwriteClient()
+    {
+        $openSkyApi = new OpenSkyApi();
+        $defaultClient = $openSkyApi->getClient();
+        $customClient = $this->createMock(ClientInterface::class);
+        $openSkyApi->setClient($customClient);
+        $this->assertInstanceOf($customClient::class, $openSkyApi->getClient());
+        $this->assertNotInstanceOf($defaultClient::class, $openSkyApi->getClient());
+    }
+
     public function testCanOverwriteFlightsResponseFabric()
     {
         $openSkyApi = new OpenSkyApi();
         $defaultFlightsResponseFabric = $openSkyApi->getFlightsResponseFabric();
-        $customFlightsResponseFabric = new class() implements FlightsResponseFabricInterface {
-            public function build(array $data): FlightsResponseInterface
-            {
-                return new FlightsResponse([]);
-            }
-        };
+        $customFlightsResponseFabric = $this->createMock(FlightsResponseFabricInterface::class);
         $openSkyApi->setFlightsResponseFabric($customFlightsResponseFabric);
         $this->assertInstanceOf($customFlightsResponseFabric::class, $openSkyApi->getFlightsResponseFabric());
         $this->assertNotInstanceOf($defaultFlightsResponseFabric::class, $openSkyApi->getFlightsResponseFabric());
@@ -179,12 +257,7 @@ final class OpenSkyApiTest extends TestCase
     {
         $openSkyApi = new OpenSkyApi();
         $defaultStatesResponseFabric = $openSkyApi->getStatesResponseFabric();
-        $customStatesResponseFabric = new class() implements StatesResponseFabricInterface {
-            public function build(array $data): StatesResponseInterface
-            {
-                return new StatesResponse(time(), []);
-            }
-        };
+        $customStatesResponseFabric = $this->createMock(StatesResponseFabricInterface::class);
         $openSkyApi->setStatesResponseFabric($customStatesResponseFabric);
         $this->assertInstanceOf($customStatesResponseFabric::class, $openSkyApi->getStatesResponseFabric());
         $this->assertNotInstanceOf($defaultStatesResponseFabric::class, $openSkyApi->getStatesResponseFabric());
