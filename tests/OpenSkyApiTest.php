@@ -4,6 +4,7 @@ namespace tests;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
@@ -227,9 +228,21 @@ final class OpenSkyApiTest extends TestCase
 
         $openSkyApi = new OpenSkyApi();
         $openSkyApi->setClient(new Client(['handler' => HandlerStack::create($mock)]));
-        $openSkyApi->setCredentials('{username}', '{password}');
 
         $this->expectException(TooManyRequestsException::class);
+        $openSkyApi->getStatesAll();
+    }
+
+    public function testApiMissShouldThrowClientException()
+    {
+        $mock = new MockHandler([
+            new Response(404, [], 'Not found' ),
+        ]);
+
+        $openSkyApi = new OpenSkyApi();
+        $openSkyApi->setClient(new Client(['handler' => HandlerStack::create($mock)]));
+
+        $this->expectException(ClientException::class);
         $openSkyApi->getStatesAll();
     }
 
