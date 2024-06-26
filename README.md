@@ -1,8 +1,9 @@
 # OpenSky REST API
 
 [![Build Status](https://github.com/xRubin/OpenSky/workflows/CI/badge.svg)](https://github.com/xRubin/OpenSky/actions)
+[![Latest Stable Version](http://poser.pugx.org/rubin/opensky/v)](https://packagist.org/packages/rubin/opensky)
 [![Coverage Status](https://coveralls.io/repos/github/xRubin/OpenSky/badge.svg?branch=master)](https://coveralls.io/github/xRubin/OpenSky?branch=master)
-[![License](https://img.shields.io/badge/license-GNU-blue.svg)](http://opensource.org/licenses/GNU)
+[![PHP Version Require](http://poser.pugx.org/rubin/opensky/require/php)](https://packagist.org/packages/rubin/opensky)
 
 PHP implementation for the [OpenSky Network](https://opensky-network.org/) REST API.
 This library is based on the [REST API docs](https://opensky-network.org/apidoc/rest.html).
@@ -10,7 +11,7 @@ This library is based on the [REST API docs](https://opensky-network.org/apidoc/
 ## Installation
 
 With composer:
-```
+```bash
 composer require rubin/opensky
 ```
 
