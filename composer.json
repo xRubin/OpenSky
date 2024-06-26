@@ -1,0 +1,32 @@
+{
+  "name": "rubin/opensky",
+  "description": "OpenSky REST API connector",
+  "keywords": [
+    "OpenSky",
+    "REST"
+  ],
+  "authors": [
+    {
+      "name": "Roman Shashurin",
+      "email": "dalamar84@mail.ru"
+    }
+  ],
+  "type": "project",
+  "require": {
+    "php": ">=8.2.0",
+    "ext-json": "*",
+    "guzzlehttp/guzzle": "^7.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^11"
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "OpenSky\\": "src/",
+      "tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": "vendor/bin/phpunit --testdox --display-deprecations tests"
+  }
+}
