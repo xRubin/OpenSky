@@ -6,8 +6,18 @@ class StateFabric implements StateFabricInterface
 {
     public function buildOne(array $data): StateInterface
     {
-        $data[16] = PositionSource::from($data[16]);
-        $data[17] = array_key_exists(17, $data) ? AircraftCategory::from($data[17]) : null;
+        $keys = array_keys($data);
+        if (!in_array(count($keys), [17, 18]))
+            throw new UnknownFormatException("Unknown State format");
+
+        if ($keys !== range(0, count($data) - 1))
+            throw new UnknownFormatException("Unknown State format");
+
+        $data[16] = array_key_exists(16, $data) ? PositionSource::tryFrom($data[16]) : null;
+        if ($data[16] === null)
+            $data[16] = PositionSource::from(0);
+        $data[17] = array_key_exists(17, $data) ? AircraftCategory::tryFrom($data[17]) : null;
+
         return new State(...$data);
     }
 

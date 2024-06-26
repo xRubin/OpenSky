@@ -31,37 +31,37 @@ enum AircraftCategory: int
      */
     public function label(): string
     {
-        return static::getLabel($this);
+        return self::getLabel($this);
     }
 
     /**
-     * @param static $value
+     * @param self $value
      * @return string
      */
     public static function getLabel(self $value): string
     {
         return match ($value) {
-            static::NO_INFORMATION_AT_ALL => 'No information at all',
-            static::NO_ADSB_INFORMATION => 'No ADS-B Emitter Category Information',
-            static::LIGHT => 'Light (< 15500 lbs)',
-            static::SMALL => 'Small (15500 to 75000 lbs)',
-            static::LARGE => 'Large (75000 to 300000 lbs)',
-            static::HIGH_VORTEX_LARGE => 'High Vortex Large (aircraft such as B-757)',
-            static::HEAVY => 'Heavy (> 300000 lbs)',
-            static::HIGH_PERFORMANCE => 'High Performance (> 5g acceleration and 400 kts)',
-            static::ROTORCRAFT => 'Rotorcraft',
-            static::GLIDER => 'Glider / sailplane',
-            static::LIGHTER_THAN_AIR => 'Lighter-than-air',
-            static::PARACHUTIST => 'Parachutist / Skydiver',
-            static::ULTRALIGHT => 'Ultralight / hang-glider / paraglider',
-            static::RESERVED => 'Reserved',
-            static::UNMANNED_AERIAL_VEHICLE => 'Unmanned Aerial Vehicle',
-            static::TRANS_ATMOSPHERIC_VEHICLE => 'Space / Trans-atmospheric vehicle',
-            static::SURFACE_VEHICLE_EMERGENCY => 'Surface Vehicle – Emergency Vehicle',
-            static::SURFACE_VEHICLE_SERVICE => 'Surface Vehicle – Service Vehicle',
-            static::PONT_OBSTACLE => 'Point Obstacle (includes tethered balloons)',
-            static::CLUSTER_OBSTACLE => 'Cluster Obstacle',
-            static::LINE_OBSTACLE => 'Line Obstacle',
+            self::NO_INFORMATION_AT_ALL => 'No information at all',
+            self::NO_ADSB_INFORMATION => 'No ADS-B Emitter Category Information',
+            self::LIGHT => 'Light (< 15500 lbs)',
+            self::SMALL => 'Small (15500 to 75000 lbs)',
+            self::LARGE => 'Large (75000 to 300000 lbs)',
+            self::HIGH_VORTEX_LARGE => 'High Vortex Large (aircraft such as B-757)',
+            self::HEAVY => 'Heavy (> 300000 lbs)',
+            self::HIGH_PERFORMANCE => 'High Performance (> 5g acceleration and 400 kts)',
+            self::ROTORCRAFT => 'Rotorcraft',
+            self::GLIDER => 'Glider / sailplane',
+            self::LIGHTER_THAN_AIR => 'Lighter-than-air',
+            self::PARACHUTIST => 'Parachutist / Skydiver',
+            self::ULTRALIGHT => 'Ultralight / hang-glider / paraglider',
+            self::RESERVED => 'Reserved',
+            self::UNMANNED_AERIAL_VEHICLE => 'Unmanned Aerial Vehicle',
+            self::TRANS_ATMOSPHERIC_VEHICLE => 'Space / Trans-atmospheric vehicle',
+            self::SURFACE_VEHICLE_EMERGENCY => 'Surface Vehicle – Emergency Vehicle',
+            self::SURFACE_VEHICLE_SERVICE => 'Surface Vehicle – Service Vehicle',
+            self::PONT_OBSTACLE => 'Point Obstacle (includes tethered balloons)',
+            self::CLUSTER_OBSTACLE => 'Cluster Obstacle',
+            self::LINE_OBSTACLE => 'Line Obstacle',
         };
     }
 }

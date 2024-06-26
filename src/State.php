@@ -120,12 +120,4 @@ class State implements StateInterface
     {
         return $this->category;
     }
-
-    public static function fromArray(array $state): static
-    {
-        $copy = $state;
-        $copy[16] = PositionSource::from($copy[16]);
-        $copy[17] = array_key_exists(17, $copy) ? AircraftCategory::from($copy[17]) : null;
-        return new static(...$copy);
-    }
 }

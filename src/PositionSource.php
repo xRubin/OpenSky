@@ -11,16 +11,16 @@ enum PositionSource: int
 
     public function label(): string
     {
-        return static::getLabel($this);
+        return self::getLabel($this);
     }
 
     public static function getLabel(self $value): string
     {
         return match ($value) {
-            static::ADSB => 'ADS-B',
-            static::ASTERIX => 'ASTERIX',
-            static::MLAT => 'MLAT',
-            static::FLARM => 'FLARM',
+            self::ADSB => 'ADS-B',
+            self::ASTERIX => 'ASTERIX',
+            self::MLAT => 'MLAT',
+            self::FLARM => 'FLARM',
         };
     }
 }
